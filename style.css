@@ -267,15 +267,15 @@ body {
     text-align: center;
 }
 
-.action-button.unlock-button {
-    background-color: #ffc107; /* Orange for unlock */
+.action-button.reinforce-button {
+    background-color: #ffc107; /* Orange for reinforce */
     color: #333;
 }
 
 .action-button:hover {
     transform: translateY(-2px);
 }
-.action-button.unlock-button:hover {
+.action-button.reinforce-button:hover {
     background-color: #e0a800;
 }
 
@@ -448,6 +448,7 @@ body {
 @media (max-width: 600px) {
     body {
         min-height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+        overflow: auto; /* Allow body scroll on mobile if content too tall */
     }
 
     #chat-container {
