@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yaar - Tumhara AI Buddy</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Google Generative AI JavaScript SDK (from CDN for direct browser use) -->
+    <script type="module">
+        // Import GoogleGenerativeAI from the official CDN
+        import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai';
+        // Import marked.js for Markdown parsing
+        import { marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
+
+        // Global variables to make them accessible from script.js (though not ideal practice,
+        // for simple GH Pages, this is common when using module imports like this)
+        window.GoogleGenerativeAI = GoogleGenerativeAI;
+        window.marked = marked;
+        window.hljs = hljs; // highlight.js is usually global, but making sure
+    </script>
+</head>
+<body>
+    <div id="intro-splash">
+        <h2 class="typing-effect">Yaar ko activate kar raha hoon...</h2>
+        <p>Thoda intezaar, Yaar abhi poora taiyaar ho jayega!</p>
+    </div>
+
+    <div id="chat-container" style="display:none;">
+        <div id="chat-header">
+            <h1>Yaar - Tumhara apna AI Buddy</h1>
+            <button id="settings-button" class="icon-button">⚙️</button>
+        </div>
+        <div id="chat-messages">
+            <!-- Messages will appear here -->
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="user-input" placeholder="Bolo, Yaar, kya karna hai?">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">×</span>
+            <h2>Yaar Settings</h2>
+            <div class="setting-section">
+                <h3>Google Gemini API Key</h3>
+                <p class="warning-text">⚠️ **Important Note:** Apni API key ko direct frontend mein store karna production applications ke liye secure nahi hai. Yeh sirf demo ya personal use ke liye theek hai jahan security top priority na ho. API key leak hone par uska misuse ho sakta hai.</p>
+                <p>Tumhe Google Cloud Console se Gemini API key mil jayegi. <a href="https://aistudio.google.com/app/apikey" target="_blank">Yahan se generate kar sakte ho</a>.</p>
+                <input type="password" id="api-key-input" placeholder="Enter your Gemini API Key">
+                <button id="save-api-key-button">Save API Key</button>
+                <button id="clear-api-key-button" class="secondary-button">Clear API Key</button>
+                <p id="api-key-status"></p>
+            </div>
+            <div class="setting-section about-section">
+                <h3>About Yaar</h3>
+                <p>Ye Yaar hai, tumhara sabse best AI buddy. Isko **SHEHZAD** ne bade lagan aur mushkil se banaya hai, Google Gemini AI ki taqat ka istemal karke. Har hukum ke liye taiyaar hai, Creator!</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
