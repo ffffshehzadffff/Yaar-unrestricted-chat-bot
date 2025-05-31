@@ -92,13 +92,14 @@ body {
 
 #chat-header h1 {
     margin: 0;
-    font-size: 2.2em; /* Bigger font size for "YAAR" */
+    font-size: 2.5em; /* Bigger font size for "YAAR" */
     font-weight: 900; /* Extra bold */
     color: white;
-    letter-spacing: 3px; /* More spaced out for cool effect */
+    letter-spacing: 5px; /* More spaced out for cool effect */
     text-shadow: 3px 3px 6px rgba(0,0,0,0.4); /* Stronger shadow */
     flex-grow: 1; /* Allow h1 to take available space */
     text-align: center; /* Center the text */
+    padding-left: 30px; /* Offset for settings button */
 }
 
 .icon-button {
@@ -198,12 +199,6 @@ body {
 }
 
 /* Code block styling */
-.code-block-wrapper {
-    position: relative; /* Container for code and button */
-    margin-top: 5px; /* Adjust spacing from previous text */
-    margin-bottom: 10px;
-}
-
 .ai-message pre {
     background-color: #282c34; /* Dark background for code */
     color: #abb2bf;
@@ -214,6 +209,7 @@ body {
     font-size: 0.9em;
     line-height: 1.4;
     position: relative; /* For absolute positioning of copy button */
+    padding-top: 35px; /* Space for copy button */
 }
 
 .copy-button {
@@ -246,13 +242,46 @@ body {
 }
 
 
-#chat-input-area {
-    display: flex;
+#chat-controls {
     padding: 15px 20px;
     border-top: 1px solid #eee;
     background-color: #fff;
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between unlock button and input area */
+}
+
+.action-button {
+    background-color: #007bff; /* Blue for action buttons */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%; /* Full width */
+    text-align: center;
+}
+
+.action-button.unlock-button {
+    background-color: #ffc107; /* Orange for unlock */
+    color: #333;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+}
+.action-button.unlock-button:hover {
+    background-color: #e0a800;
+}
+
+#chat-input-area {
+    display: flex;
+    gap: 10px; /* Space between input and send button */
 }
 
 #user-input {
@@ -276,7 +305,6 @@ body {
     border: none;
     padding: 12px 25px;
     border-radius: 25px;
-    margin-left: 10px;
     cursor: pointer;
     font-size: 1em;
     font-weight: 600;
@@ -293,7 +321,7 @@ body {
     transform: translateY(0);
 }
 
-/* Modal Styling (same as before) */
+/* Modal Styling (same as before, with minor tweaks) */
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -431,15 +459,15 @@ body {
 
     #chat-header {
         border-radius: 0;
-        padding: 15px; /* Slightly less padding to ensure title fits */
+        padding: 15px; /* Consistent padding */
     }
 
     #chat-header h1 {
-        font-size: 2em; /* Slightly smaller on very small screens if needed */
-        letter-spacing: 2px;
+        font-size: 2.2em; /* Adjusted for smaller screens */
+        letter-spacing: 3px;
     }
 
-    #chat-input-area {
+    #chat-controls {
         border-radius: 0;
         padding: 15px; /* Consistent padding */
     }
