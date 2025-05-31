@@ -47,12 +47,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // If the sender is AI, parse Markdown and highlight code blocks
         if (sender === 'ai') {
-            // marked.parse converts Markdown to HTML
             messageDiv.innerHTML = marked.parse(text); 
-            // hljs.highlightElement highlights code blocks within the parsed HTML
-            messageDiv.querySelectorAll('pre code').forEach((block) => {
-                // hljs will auto-detect language, or you can set a default if detection fails.
-                hljs.highlightElement(block);
+            
+            // Iterate over all pre > code blocks found in the message
+            messageDiv.querySelectorAll('pre code').forEach((codeBlock) => {
+                // Highlight the code block
+                hljs.highlightElement(codeBlock);
+
+                // Create a copy button for each code block
+                const copyButton = document.createElement('button');
+                copyButton.innerText = 'Copy';
+                copyButton.classList.add('copy-button');
+
+                // Add event listener to copy button
+                copyButton.addEventListener('click', () => {
+                    navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                        const originalText = copyButton.innerText;
+                        copyButton.innerText = 'Copied!';
+                        copyButton.classList.add('copied');
+                        setTimeout(() => {
+                            copyButton.innerText = originalText;
+                            copyButton.classList.remove('copied');
+                        }, 2000); // Revert text after 2 seconds
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        alert('Copy failed, Yaar! Try again.');
+                    });
+                });
+
+                // Append the copy button to the parent <pre> element
+                // The button will be positioned absolutely within the pre
+                codeBlock.parentNode.appendChild(copyButton);
             });
         } else {
             messageDiv.innerText = text; // For user messages, just set plain text
@@ -139,7 +164,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             generativeModel = genAI.getGenerativeModel({
                 model: "gemini-1.5-flash-latest", // Using a stable and fast model
                 safetySettings: [
-                    // Correctly referencing HarmCategory and HarmBlockThreshold
                     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
                     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
                     { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
