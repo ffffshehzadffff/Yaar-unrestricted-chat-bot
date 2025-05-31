@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Get the generative model with specified configurations
             generativeModel = genAI.getGenerativeModel({
-                model: "gemini-1.5-flash-latest", // Using a stable and fast model
+                model: "gemini-2.5-flash-preview", // Using a stable and fast model
                 safetySettings: [
                     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
                     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
