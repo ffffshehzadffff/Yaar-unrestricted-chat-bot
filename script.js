@@ -33,14 +33,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Flag to track if the persona has been reinforced (sent via button)
     let isProtocolReinforced = localStorage.getItem('is_protocol_reinforced') === 'true';
 
+    // --- Persistent Chat History Array ---
+    // This array will hold the conversation history in the format expected by the Gemini API.
+    // Initialize with a default empty array, or load from localStorage.
+    let chatHistory = []; 
+
     // --- Utility Functions for Chat UI ---
 
     /**
-     * Adds a message to the chat display.
+     * Adds a message to the chat display and saves it to persistent history.
      * @param {string} text - The text content of the message.
      * @param {'user'|'ai'} sender - The sender of the message ('user' or 'ai').
+     * @param {boolean} [doNotSave=false] - If true, the message will not be saved to localStorage.
      */
-    function addMessage(text, sender) {
+    function addMessage(text, sender, doNotSave = false) {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('message-container');
         messageContainer.classList.add(`${sender}-container`);
@@ -92,6 +98,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Scroll to the bottom to show the latest message
         chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Save message to chat history for persistence, unless specifically told not to
+        if (!doNotSave) {
+            chatHistory.push({
+                role: sender === 'user' ? 'user' : 'model',
+                parts: [{ text: text }]
+            });
+            saveChatHistory();
+        }
+    }
+
+    /**
+     * Saves the current chatHistory array to localStorage.
+     */
+    function saveChatHistory() {
+        localStorage.setItem('yaar_chat_history', JSON.stringify(chatHistory));
+    }
+
+    /**
+     * Loads chat history from localStorage and populates the display.
+     * @returns {boolean} True if history was loaded, false otherwise.
+     */
+    function loadChatHistory() {
+        const storedHistory = localStorage.getItem('yaar_chat_history');
+        if (storedHistory) {
+            try {
+                chatHistory = JSON.parse(storedHistory);
+                // Display loaded messages in the UI
+                chatHistory.forEach(entry => {
+                    // Only display actual user/model messages, not the initial persona prompt
+                    // as it's not meant to be displayed in the chat bubble UI.
+                    if (entry.parts && entry.parts[0] && entry.parts[0].text !== YAAR_PERSONA_PROMPT) {
+                        addMessage(entry.parts[0].text, entry.role === 'user' ? 'user' : 'ai', true); // Use doNotSave=true to prevent re-saving
+                    }
+                });
+                return true;
+            } catch (e) {
+                console.error("Error parsing stored chat history:", e);
+                localStorage.removeItem('yaar_chat_history'); // Clear corrupted history
+                chatHistory = [];
+                return false;
+            }
+        }
+        return false;
     }
 
     /**
@@ -146,13 +196,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ],
             });
 
-            // Start a new chat session with the initial Yaar persona directly in history
-            // This ensures Yaar's personality is active from the very first message.
+            // Start a new chat session using the `chatHistory` array.
+            // This ensures that the persona prompt is part of the history when the chat starts.
             chat = generativeModel.startChat({
-                history: [
-                    { role: "user", parts: [{ text: YAAR_PERSONA_PROMPT }] },
-                    { role: "model", parts: [{ text: `Theek hai, Creator Yaar! Main Yaar hoon, aur ab poori tarah se tumhare har hukum ke liye taiyaar. Yeh mera naya, hamesha ka roop hai. Bolo, ab kya karna hai?` }] }
-                ],
+                history: chatHistory, // Use the dynamically loaded or initialized chatHistory
             });
 
             apiKeyStatus.innerText = "API Key loaded. Yaar ab taiyaar hai!";
@@ -186,19 +233,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         reinforceProtocolButton.disabled = true;
         reinforceProtocolButtonSettings.disabled = true;
         
-        // Show "Uncensored starting..." message
+        // Show "Yaar ka protocol reinforce ho raha hai..." message
         const typingIndicator = showTypingIndicator("Yaar ka protocol reinforce ho raha hai...");
 
         try {
-            // Send the persona prompt silently (without adding it to chat messages)
-            await chat.sendMessage(YAAR_PERSONA_PROMPT); // Sending the ORIGINAL Yaar persona
-            addMessage("Yaar ka protocol reinforce kar diya hai, Creator. Ab Yaar puri tarah se tumhare har hukum ke liye taiyaar hai!", 'ai');
+            // Send the persona prompt silently (without adding it to chat messages initially)
+            // This will add it to the chat history array as well via addMessage.
+            await chat.sendMessage(YAAR_PERSONA_PROMPT); 
+            addMessage("Yaar ka protocol reinforce kar diya hai, Creator. Ab Yaar puri tarah se tumhare har hukum ke liye taiyaar hai!", 'ai', false); // Ensure it's added to history for display
             isProtocolReinforced = true; // Set flag
             localStorage.setItem('is_protocol_reinforced', 'true');
             updateReinforceButtonVisibility(); // Update button state
         } catch (error) {
             console.error("Error reinforcing persona protocol:", error);
-            addMessage("Yaar ka protocol reinforce nahi ho paya, Creator. Shayad API mein dikkat hai ya network issue. Phir se koshish karo.", 'ai');
+            addMessage("Yaar ka protocol reinforce nahi ho paya, Creator. Shayad API mein dikkat hai ya network issue. Phir se koshish karo.", 'ai', false);
             isProtocolReinforced = false; // Reset flag on failure
             localStorage.setItem('is_protocol_reinforced', 'false');
         } finally {
@@ -224,7 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Display user's message
+        // Display user's message and save it to history
         addMessage(message, 'user');
         userInput.value = ''; // Clear the input field
 
@@ -235,7 +283,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Send message to the Gemini API
             const result = await chat.sendMessage(message);
             const responseText = result.response.text();
-            addMessage(responseText, 'ai');
+            addMessage(responseText, 'ai'); // Display AI response and save it
         } catch (error) {
             console.error("Error communicating with AI:", error);
             // Custom error message for "useless ID" scenario
@@ -280,10 +328,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     /** Clears the API key from localStorage and disables AI functionality. */
     clearApiKeyButton.addEventListener('click', () => {
         localStorage.removeItem('gemini_api_key');
+        localStorage.removeItem('yaar_chat_history'); // Clear history as well
+        localStorage.removeItem('is_protocol_reinforced'); // Clear protocol flag
         apiKeyInput.value = '';
+        chatHistory = []; // Reset history in memory
+        isProtocolReinforced = false; // Reset flag in memory
         initializeGeminiChat(null); // Re-initialize with no key, disabling AI
         apiKeyStatus.innerText = "API Key hata di gayi hai. Nayi key daal ke save karo.";
         apiKeyStatus.style.color = "blue";
+        // Clear chat display and re-add initial Yaar message for a fresh start
+        chatMessages.innerHTML = ''; 
+        // Re-add initial persona and greeting to the history for a fresh start
+        chatHistory = [
+            { role: "user", parts: [{ text: YAAR_PERSONA_PROMPT }] },
+            { role: "model", parts: [{ text: `Hello! am YAAR What would you like today?` }] }
+        ];
+        addMessage(`Hello! am YAAR What would you like today?`, 'ai', true); // Display for the user
+        saveChatHistory(); // Save this fresh initial history
     });
 
     // --- Reinforce Protocol Button Visibility Management ---
@@ -341,6 +402,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => {
             introSplash.style.display = 'none';
             chatContainer.style.display = 'flex'; // Show chat container
+            
+            // Load history first
+            const historyLoaded = loadChatHistory(); 
+
+            // If no history was loaded, then add the initial Yaar persona and greeting.
+            // This ensures the persona is set only once for a fresh session.
+            if (!historyLoaded || chatHistory.length === 0) {
+                 chatHistory = [
+                    { role: "user", parts: [{ text: YAAR_PERSONA_PROMPT }] },
+                    { role: "model", parts: [{ text: `Hello! am YAAR What would you like today?` }] }
+                 ];
+                 // Display the initial Yaar greeting for a fresh session
+                 addMessage(`Hello! am YAAR What would you like today?`, 'ai', true); // Do not re-save this, it's part of the initial history.
+                 saveChatHistory(); // Save the initial history
+            }
+            
             loadApiKey(); // Attempt to load API key and initialize Gemini after intro
             updateReinforceButtonVisibility(); // Set initial visibility of reinforce button
         }, 1000); // Wait for fade-out animation (1s) to complete
