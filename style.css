@@ -1,3 +1,8 @@
+/* Universal box-sizing for consistent layout */
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #f0f2f5;
@@ -7,7 +12,7 @@ body {
     min-height: 100vh;
     margin: 0;
     color: #333;
-    overflow: hidden; /* Hide scrollbar for intro */
+    overflow: hidden; /* Hide scrollbar for intro, will be `auto` for chat */
 }
 
 #intro-splash {
@@ -59,14 +64,14 @@ body {
     50% { border-color: orange; }
 }
 
-
 #chat-container {
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    width: 90%;
+    width: 95%; /* More adaptive width for better fit on various screens */
     max-width: 500px;
     height: 70vh;
+    min-height: 400px; /* Minimum height to prevent collapse */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -87,9 +92,13 @@ body {
 
 #chat-header h1 {
     margin: 0;
-    font-size: 1.4em;
-    font-weight: 600;
+    font-size: 2.2em; /* Bigger font size for "YAAR" */
+    font-weight: 900; /* Extra bold */
+    color: white;
+    letter-spacing: 3px; /* More spaced out for cool effect */
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.4); /* Stronger shadow */
     flex-grow: 1; /* Allow h1 to take available space */
+    text-align: center; /* Center the text */
 }
 
 .icon-button {
@@ -106,11 +115,10 @@ body {
     transform: rotate(30deg);
 }
 
-
 #chat-messages {
     flex-grow: 1;
     padding: 20px;
-    overflow-y: auto;
+    overflow-y: auto; /* Enable scrolling when content overflows */
     background-color: #e8eaf6; /* Light purple background */
     border-bottom: 1px solid #dcdcdc;
 }
@@ -147,7 +155,7 @@ body {
 }
 
 .message {
-    max-width: 80%;
+    max-width: 85%; /* Slightly more space for messages */
     padding: 12px 18px;
     border-radius: 20px;
     line-height: 1.5;
@@ -190,22 +198,53 @@ body {
 }
 
 /* Code block styling */
+.code-block-wrapper {
+    position: relative; /* Container for code and button */
+    margin-top: 5px; /* Adjust spacing from previous text */
+    margin-bottom: 10px;
+}
+
 .ai-message pre {
     background-color: #282c34; /* Dark background for code */
     color: #abb2bf;
-    padding: 10px;
+    padding: 15px; /* Increased padding */
     border-radius: 8px;
     overflow-x: auto;
     font-family: 'Fira Code', 'Roboto Mono', monospace; /* Monospace font for code */
     font-size: 0.9em;
     line-height: 1.4;
-    margin-top: 5px; /* Adjust spacing */
+    position: relative; /* For absolute positioning of copy button */
 }
 
-.ai-message pre code {
-    white-space: pre-wrap; /* Ensure code wraps within pre */
-    word-break: break-all; /* Break long lines if needed */
+.copy-button {
+    position: absolute;
+    top: 5px; /* Adjust as needed */
+    right: 5px; /* Adjust as needed */
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8em;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s ease;
+    z-index: 1; /* Ensure button is above code */
 }
+
+.ai-message pre:hover .copy-button {
+    opacity: 1; /* Show on hover */
+}
+
+.copy-button:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.copy-button.copied {
+    background-color: #4CAF50; /* Green when copied */
+    color: white;
+}
+
 
 #chat-input-area {
     display: flex;
@@ -224,6 +263,7 @@ body {
     font-size: 1em;
     outline: none;
     transition: border-color 0.3s;
+    min-width: 0; /* Allow input to shrink on smaller screens */
 }
 
 #user-input:focus {
@@ -241,6 +281,7 @@ body {
     font-size: 1em;
     font-weight: 600;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    flex-shrink: 0; /* Prevent button from shrinking */
 }
 
 #send-button:hover {
@@ -252,7 +293,7 @@ body {
     transform: translateY(0);
 }
 
-/* Modal Styling */
+/* Modal Styling (same as before) */
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -316,7 +357,7 @@ body {
 }
 
 .setting-section input[type="password"] {
-    width: calc(100% - 22px); /* Account for padding */
+    width: 100%; /* Ensure it takes full width within its padding */
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
@@ -375,25 +416,36 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments for mobile */
 @media (max-width: 600px) {
+    body {
+        min-height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+    }
+
     #chat-container {
         width: 100%;
-        height: 100vh;
+        height: 100dvh; /* Full viewport height on small screens */
         border-radius: 0;
         box-shadow: none;
     }
 
     #chat-header {
         border-radius: 0;
+        padding: 15px; /* Slightly less padding to ensure title fits */
+    }
+
+    #chat-header h1 {
+        font-size: 2em; /* Slightly smaller on very small screens if needed */
+        letter-spacing: 2px;
     }
 
     #chat-input-area {
         border-radius: 0;
+        padding: 15px; /* Consistent padding */
     }
 
     .modal-content {
         width: 95%;
         padding: 20px;
     }
-}
+    }
