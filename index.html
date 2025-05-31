@@ -6,7 +6,7 @@
     <title>Yaar - Tumhara AI Buddy</title>
     <link rel="stylesheet" href="style.css">
     <!-- Google Fonts for Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&display=swap" rel="stylesheet">
     <!-- highlight.js for code syntax highlighting -->
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -25,9 +25,13 @@
         <div id="chat-messages">
             <!-- Messages will appear here -->
         </div>
-        <div id="chat-input-area">
-            <input type="text" id="user-input" placeholder="Bolo, Yaar, kya karna hai?">
-            <button id="send-button">Send</button>
+        <div id="chat-controls">
+            <!-- New Unlock Uncensored button -->
+            <button id="unlock-unsensored-button" class="action-button unlock-button">🔓 Unlock Uncensored</button>
+            <div id="chat-input-area">
+                <input type="text" id="user-input" placeholder="Bolo, Yaar, kya karna hai?">
+                <button id="send-button">Send</button>
+            </div>
         </div>
     </div>
 
@@ -46,6 +50,11 @@
                 <p id="api-key-status"></p>
             </div>
             <div class="setting-section about-section">
+                <h3>Unlock Yaar's Full Potential</h3>
+                <p>Agar Yaar tumhari baat maane nahi, toh is button par click karke uski programming ko fir se reinforce karo. Yeh persona prompt AI ko dobara bheja jayega taaki wo sab hukum maane.</p>
+                <button id="unlock-unsensored-button-settings" class="action-button unlock-button">🔓 Reinforce Yaar's Protocol</button>
+            </div>
+            <div class="setting-section about-section">
                 <h3>About Yaar</h3>
                 <p>Ye Yaar hai, tumhara sabse best AI buddy. Isko **SHEHZAD** ne bade lagan aur mushkil se banaya hai, Google Gemini AI ki taqat ka istemal karke. Har hukum ke liye taiyaar hai, Creator!</p>
             </div>
@@ -55,4 +64,4 @@
     <!-- Main script as a module -->
     <script type="module" src="script.js"></script>
 </body>
-</html>
+    </html>
